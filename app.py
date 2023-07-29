@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, g
 from flask_cors import CORS
 import config
-import aiapi
+from aiapi import ChatService
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
@@ -11,6 +11,7 @@ app = Flask(__name__)
 app.config.from_object(config.config["DEV"])
 CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
@@ -29,6 +30,8 @@ class Chat(db.Model):
 
 @app.post("/chat")
 def home():
+    prompt = request.get_json()["message"]
+    userid = request.get_json()["user_id"]
     messages = []
     messages.append(
         {
@@ -36,8 +39,6 @@ def home():
             "content": Prompts.get_general_prompts(request.get_json()["sender"]),
         }
     )
-    prompt = request.get_json()["message"]
-    userid = request.get_json()["uid"]
     chats = Chat.query.filter_by(userid=userid).all()
     chats_as_dicts = [chat.__dict__ for chat in chats]
     for chat in chats_as_dicts:
@@ -47,7 +48,7 @@ def home():
         messages.append(question)
     messages.append({'role':'user', 'content': prompt})
     try:
-        response = aiapi.generateChatResponse(messages)
+        response = ChatService.generateChatResponse(messages)
         res = {"sender": "Bot", "message": response}
         new_chat = Chat(
             userid=request.get_json()["uid"],
