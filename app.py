@@ -5,6 +5,7 @@ import aiapi
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
+from prompts import Prompts
 
 app = Flask(__name__)
 app.config.from_object(config.config["DEV"])
@@ -32,7 +33,7 @@ def home():
     messages.append(
         {
             "role": "system",
-            "content": "You are a general chat bot that answers everything.",
+            "content": Prompts.get_general_prompts(request.get_json()["sender"]),
         }
     )
     prompt = request.get_json()["message"]
