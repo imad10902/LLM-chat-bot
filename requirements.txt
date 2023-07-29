@@ -8,7 +8,7 @@ certifi==2023.7.22
 charset-normalizer==3.2.0
 click==8.1.6
 colorama==0.4.6
-Flask==2.3.2
+Flask
 Flask-Cors==4.0.0
 Flask-Migrate==4.0.4
 Flask-SQLAlchemy==3.0.5
